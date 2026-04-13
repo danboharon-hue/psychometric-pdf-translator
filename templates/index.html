@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>מבחן פסיכומטרי — כמה מילים תדע?</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:      #e9f3fa;
+      --surface: #ffffff;
+      --border:  #b8d8ed;
+      --accent:  #2a7dc9;
+      --accent2: #1a5f9e;
+      --text:    #1a2d3d;
+      --muted:   #6a8ca0;
+      --r:       10px;
+      --line-h:  28px;
+      --line-c:  #c5dff0;
+      --margin-c:#e89090;
+    }
+    html, body { height: 100%; overflow: hidden; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      color: var(--text); font-size: 14px;
+      background-color: var(--bg);
+      background-image:
+        repeating-linear-gradient(
+          transparent 0px,
+          transparent calc(var(--line-h) - 1px),
+          var(--line-c) calc(var(--line-h) - 1px),
+          var(--line-c) var(--line-h)
+        ),
+        linear-gradient(to left, var(--margin-c) 0px, var(--margin-c) 2px, transparent 2px);
+      background-attachment: local;
+    }
+
+    /* ══ TOP BAR ══ */
+    .topbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: 50px;
+      background: var(--accent2);
+      border-bottom: 1px solid #164e84;
+      display: none; align-items: center; gap: 9px;
+      padding: 0 14px;
+    }
+    .topbar.on { display: flex; }
+
+    .tb-logo {
+      display: flex; align-items: center; gap: 7px;
+      font-weight: 700; font-size: 13px;
+      white-space: nowrap; color: #fff; opacity: .9; flex-shrink: 0;
+    }
+    .tb-sep { width: 1px; height: 20px; background: rgba(255,255,255,.2); flex-shrink: 0; }
+
+    /* Segmented control */
+    .vseg {
+      display: flex; flex-shrink: 0;
+      background: rgba(0,0,0,.25);
+      border-radius: 8px; padding: 3px; gap: 2px;
+    }
+    .vseg-btn {
+      height: 30px; padding: 0 13px;
+      border-radius: 6px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: none;
+      background: transparent; color: rgba(255,255,255,.6);
+      font-family: inherit; white-space: nowrap; transition: all .15s;
+    }
+    .vseg-btn.active { background: var(--surface); color: var(--accent2); }
+    .vseg-btn:not(.active):hover { color: #fff; background: rgba(255,255,255,.12); }
+
+    /* ── Stat chips ── */
+    .tb-chip {
+      display: flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 6px;
+      font-size: 11.5px; white-space: nowrap; flex-shrink: 0;
+      border: 1px solid; line-height: 1;
+    }
+    .tb-chip b { font-weight: 700; }
+
+    .chip-green {
+      background: #f0fdf4; color: #15803d;
+      border-color: #86efac;
+    }
+    .chip-red {
+      background: #fff1f2; color: #be123c;
+      border-color: #fda4af;
+    }
+    .chip-orange {
+      background: #fff7ed; color: #c2410c;
+      border-color: #fdba74;
+    }
+
+    .chip-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .dot-green  { background: #22c55e; }
+    .dot-red    { background: #f43f5e; }
+    .dot-orange { background: #f97316; }
+
+    .chip-sub { font-size: 10px; opacity: .75; }
+
+    .tb-file {
+      font-size: 11px; color: rgba(255,255,255,.45); overflow: hidden;
+      text-overflow: ellipsis; white-space: nowrap; flex: 1;
+      direction: ltr; text-align: left;
+    }
+    .tb-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      height: 30px; padding: 0 12px;
+      border-radius: 7px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1px solid; font-family: inherit;
+      white-space: nowrap; transition: background .15s; flex-shrink: 0;
+    }
+    .tb-back {
+      background: rgba(255,255,255,.1); color: rgba(255,255,255,.8);
+      border-color: rgba(255,255,255,.2);
+    }
+    .tb-back:hover { background: rgba(255,255,255,.2); color: #fff; }
+    .tb-dl   { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
+    .tb-dl:hover { background: #dcfce7; }
+
+    /* ══ MAIN ══ */
+    .main { height: 100vh; display: flex; }
+
+    /* ══ SETUP ══ */
+    .setup {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      padding: 40px 20px;
+    }
+    .card {
+      background: rgba(255,255,255,.90);
+      backdrop-filter: blur(6px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 34px 36px 36px;
+      width: 100%; max-width: 500px;
+    }
+
+    .card-title {
+      font-size: 20px; font-weight: 800; letter-spacing: -.5px;
+      color: var(--accent2); margin-bottom: 5px; line-height: 1.25;
+      display: flex; align-items: center; gap: 9px;
+    }
+    .card-sub {
+      color: var(--muted); font-size: 12.5px; margin-bottom: 26px;
+      line-height: 1.55; padding-right: 2px;
+    }
+
+    /* ── Word list cards ── */
+    .wl-label {
+      font-size: 11px; font-weight: 700; letter-spacing: .6px;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+    }
+    .wl-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px;
+    }
+    .wl-card {
+      position: relative; cursor: pointer;
+      border: 2px solid var(--border); border-radius: 11px;
+      padding: 14px 13px 13px;
+      background: var(--surface);
+      transition: border-color .15s, background .15s;
+      text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+    }
+    .wl-card:hover  { border-color: var(--accent); }
+    .wl-card.sel    { border-color: var(--accent); background: #eef6fd; }
+    .wl-card input  { position: absolute; opacity: 0; pointer-events: none; }
+    .wl-icon-wrap {
+      width: 38px; height: 38px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      background: #dbeafe;
+    }
+    .wl-card.sel .wl-icon-wrap { background: #bfdbfe; }
+    .wl-name { font-size: 12px; font-weight: 700; color: var(--text); line-height: 1.3; }
+    .wl-desc { font-size: 10.5px; color: var(--muted); line-height: 1.35; }
+    .wl-badge {
+      margin-top: 2px; display: inline-block; font-size: 9.5px; font-weight: 700;
+      background: #dbeafe; color: var(--accent2);
+      padding: 1px 8px; border-radius: 99px; border: 1px solid #bfdbfe;
+    }
+    .wl-card.sel .wl-badge { background: var(--accent2); color: #fff; border-color: var(--accent2); }
+
+    .divider { height: 1px; background: var(--border); margin: 2px 0 18px; opacity: .6; }
+
+    .field { margin-bottom: 14px; }
+
+    /* Source tabs */
+    .src-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 9px; }
+    .src-main-tab {
+      font-size: 13px; font-weight: 700; color: var(--accent2);
+      cursor: pointer; padding-bottom: 2px;
+      border-bottom: 2px solid var(--accent2);
+      white-space: nowrap;
+    }
+    .src-main-tab.inactive {
+      color: var(--muted); border-bottom-color: transparent; font-weight: 500;
+    }
+    .src-main-tab.inactive:hover { color: var(--accent); }
+    .src-alt-tab {
+      font-size: 12px; font-weight: 500; color: var(--muted);
+      cursor: pointer; padding-bottom: 2px;
+      border-bottom: 2px solid transparent;
+      background: none; border-left: none; border-right: none; border-top: none;
+      font-family: inherit; transition: color .15s;
+    }
+    .src-alt-tab:hover { color: var(--accent); }
+    .src-alt-tab.active { color: var(--accent2); border-bottom-color: var(--accent2); font-weight: 700; }
+
+    .pdf-panel { display: none; } .pdf-panel.active { display: block; }
+
+    .pdf-list {
+      display: flex; flex-direction: column; gap: 5px;
+      max-height: 210px; overflow-y: auto;
+      padding-left: 2px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    .pdf-list::-webkit-scrollbar { width: 5px; }
+    .pdf-list::-webkit-scrollbar-track { background: transparent; }
+    .pdf-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+    .pdf-item {
+      display: flex; align-items: center; gap: 8px; padding: 10px 12px;
+      border: 1px solid var(--border); border-radius: 9px;
+      cursor: pointer; transition: border-color .15s; background: var(--surface);
+    }
+    .pdf-item:hover { border-color: var(--accent); }
+    .pdf-item.sel   { border-color: var(--accent); background: #eef6fd; }
+    .pdf-item input { display: none; }
+    .rdot {
+      width: 14px; height: 14px; border: 2px solid #bbb; border-radius: 50%;
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      transition: border-color .15s;
+    }
+    .rdot::after {
+      content:''; width:6px; height:6px; border-radius:50%;
+      background: var(--accent); opacity:0; transition:opacity .15s;
+    }
+    .pdf-item.sel .rdot { border-color: var(--accent); }
+    .pdf-item.sel .rdot::after { opacity: 1; }
+    .pdf-name { font-size: 12.5px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .drop {
+      border: 1px dashed var(--border); border-radius: var(--r); padding: 18px 20px;
+      text-align: center; cursor: pointer; transition: border-color .15s, background .15s;
+      position: relative; background: var(--surface);
+    }
+    .drop:hover, .drop.over { border-color: var(--accent); background: #eef6fd; }
+    .drop input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+    .drop-txt  { color: var(--muted); font-size: 12px; }
+    .drop-hint { font-size: 11px; color: var(--muted); margin-top: 2px; opacity: .65; }
+    .drop-file { color: var(--text); font-size: 12px; margin-top: 5px; font-weight: 500; }
+
+    .proc-btn {
+      width: 100%; height: 42px; margin-top: 20px;
+      background: var(--accent);
+      color: #fff; border: none; border-radius: var(--r);
+      font-size: 14px; font-weight: 700; letter-spacing: -.1px;
+      cursor: pointer; transition: background .15s; font-family: inherit;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .proc-btn:hover:not(:disabled) { background: var(--accent2); }
+    .proc-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    /* ══ OVERLAY ══ */
+    .overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(233,243,250,.82); backdrop-filter: blur(4px);
+      z-index: 200; align-items: center; justify-content: center;
+      flex-direction: column; gap: 14px;
+    }
+    .overlay.on { display: flex; }
+    .spin {
+      width: 34px; height: 34px; border: 3px solid #c5dff0;
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin-txt { font-size: 13px; color: var(--muted); font-weight: 500; }
+
+    /* ══ VIEWER ══ */
+    .viewer { display: none; flex: 1; flex-direction: column; min-height: 0; margin-top: 50px; }
+    .viewer.on { display: flex; }
+    .frame { flex: 1; min-height: 0; border: none; display: block; width: 100%; background: #525659; }
+
+    /* ══ ERROR ══ */
+    .err {
+      display: none; position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+      background: #fff1f2; border: 1px solid #fecaca; color: #dc2626;
+      padding: 8px 16px; border-radius: 8px; font-size: 13px; z-index: 300; white-space: nowrap;
+    }
+    .err.on { display: block; }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar" id="topbar">
+
+  <div class="tb-logo">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <rect x="2" y="2" width="6" height="14" rx="1.5" fill="rgba(255,255,255,.35)"/>
+      <rect x="10" y="2" width="6" height="14" rx="1.5" fill="rgba(255,255,255,.35)"/>
+      <rect x="8" y="1" width="2" height="16" rx="1" fill="rgba(255,255,255,.6)"/>
+    </svg>
+    פסיכומטרי
+  </div>
+
+  <div class="tb-sep"></div>
+
+  <div class="vseg" id="viewerListWrap">
+    {% for n in word_lists %}
+    <button class="vseg-btn{% if loop.first %} active{% endif %}"
+            data-list="{{ n }}" onclick="switchListBtn(this)">{{ n }}</button>
+    {% endfor %}
+  </div>
+
+  <div class="tb-sep"></div>
+
+  <!-- Green: percentage -->
+  <div class="tb-chip chip-green">
+    <span class="chip-dot dot-green"></span>
+    <b id="sPct">—%</b>
+    <span class="chip-sub">מהמילים הופיעו במילון</span>
+  </div>
+
+  <!-- Red: unknown words -->
+  <div class="tb-chip chip-red">
+    <span class="chip-dot dot-red"></span>
+    <b id="sX">—</b>
+    <span class="chip-sub">מילים שלא היו במילון</span>
+    <span id="sXu" style="font-size:10px;opacity:.75;"></span>
+  </div>
+
+  <!-- Orange: proper nouns -->
+  <div class="tb-chip chip-orange">
+    <span class="chip-dot dot-orange"></span>
+    <b id="sN">—</b>
+    <span class="chip-sub">שמות</span>
+  </div>
+
+  <div class="tb-sep"></div>
+  <div class="tb-file" id="sF"></div>
+
+  <button class="tb-btn tb-back" onclick="goBack()">
+    <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+      <path d="M8 2.5L4.5 6.5L8 10.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    חזרה
+  </button>
+  <a class="tb-btn tb-dl" id="btnDl" href="#">
+    <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+      <path d="M6.5 2v7M3.5 6.5l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M2 11h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+    הורד
+  </a>
+</header>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay">
+  <div class="spin"></div>
+  <span class="spin-txt" id="spinTxt">מתרגם...</span>
+</div>
+
+<div class="main">
+  <div class="setup" id="setup">
+    <div class="card">
+
+      <div class="card-title">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <rect x="2" y="3" width="8" height="16" rx="2" fill="#bfdbfe"/>
+          <rect x="12" y="3" width="8" height="16" rx="2" fill="#bfdbfe"/>
+          <rect x="9.5" y="2" width="3" height="18" rx="1.5" fill="#93c5fd"/>
+          <line x1="4" y1="7" x2="8" y2="7" stroke="#2a7dc9" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="4" y1="10" x2="8" y2="10" stroke="#2a7dc9" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="4" y1="13" x2="8" y2="13" stroke="#2a7dc9" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="14" y1="7" x2="18" y2="7" stroke="#2a7dc9" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="14" y1="10" x2="18" y2="10" stroke="#2a7dc9" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="14" y1="13" x2="18" y2="13" stroke="#2a7dc9" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+        בחר מבחן פסיכומטרי
+      </div>
+      <p class="card-sub">וראה כמה מהמילים תדע אם תלמד את רשימת המילים</p>
+
+      <div class="wl-label">בחר רשימת מילים</div>
+      <div class="wl-grid">
+
+        <!-- Card 1: NGSL -->
+        <label class="wl-card sel" onclick="pickList(this)">
+          <input type="radio" name="wlist" value="{{ word_lists[0] }}" checked>
+          <div class="wl-icon-wrap">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="10" r="7.5" stroke="#2a7dc9" stroke-width="1.6"/>
+              <path d="M10 2.5C10 2.5 7.5 5.5 7.5 10s2.5 7.5 2.5 7.5" stroke="#2a7dc9" stroke-width="1.4" stroke-linecap="round"/>
+              <path d="M10 2.5C10 2.5 12.5 5.5 12.5 10s-2.5 7.5-2.5 7.5" stroke="#2a7dc9" stroke-width="1.4" stroke-linecap="round"/>
+              <line x1="2.5" y1="10" x2="17.5" y2="10" stroke="#2a7dc9" stroke-width="1.4"/>
+              <line x1="3.5" y1="6.5" x2="16.5" y2="6.5" stroke="#2a7dc9" stroke-width="1" opacity=".5"/>
+              <line x1="3.5" y1="13.5" x2="16.5" y2="13.5" stroke="#2a7dc9" stroke-width="1" opacity=".5"/>
+            </svg>
+          </div>
+          <span class="wl-name">NGSL</span>
+          <span class="wl-desc">רשימה בינלאומית שנוצרה על ידי חוקרים</span>
+          <span class="wl-badge">2,807 מילים</span>
+        </label>
+
+        <!-- Card 2: Psychometric -->
+        <label class="wl-card" onclick="pickList(this)">
+          <input type="radio" name="wlist" value="{{ word_lists[1] if word_lists|length > 1 else '' }}">
+          <div class="wl-icon-wrap">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <rect x="3.5" y="2" width="11" height="14.5" rx="2" stroke="#2a7dc9" stroke-width="1.6"/>
+              <line x1="6" y1="6" x2="12" y2="6" stroke="#2a7dc9" stroke-width="1.4" stroke-linecap="round"/>
+              <line x1="6" y1="9" x2="12" y2="9" stroke="#2a7dc9" stroke-width="1.4" stroke-linecap="round"/>
+              <line x1="6" y1="12" x2="9" y2="12" stroke="#2a7dc9" stroke-width="1.4" stroke-linecap="round"/>
+              <circle cx="15" cy="15" r="4" fill="#2a7dc9"/>
+              <path d="M12.8 15l1.5 1.5 2.5-2.5" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="wl-name">מילון הפסיכומטרי של המדינה</span>
+          <span class="wl-desc">רשימת מילים מהקורס של הפסיכומטרי של המדינה</span>
+          <span style="font-size:9.5px;color:var(--muted);opacity:.8;">(לא מכיל מילים בסיסיות)</span>
+          {% if word_lists|length > 1 %}
+          <span class="wl-badge">3,517 מילים</span>
+          {% endif %}
+        </label>
+
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="field">
+        <div class="src-row">
+          <span class="src-main-tab" id="tabPreLabel" onclick="activateTab('pre')">מבחני הפסיכומטרי</span>
+          <button class="src-alt-tab" id="tabUpBtn" onclick="activateTab('up')">העלאת קובץ</button>
+        </div>
+
+        <div class="pdf-panel active" id="panel-pre">
+          <div class="pdf-list">
+            {% for pdf in preloaded_pdfs %}
+            <div class="pdf-item {% if loop.first %}sel{% endif %}" onclick="pickPre(this,'{{ pdf }}')">
+              <input type="radio" name="pre" value="{{ pdf }}" {% if loop.first %}checked{% endif %}>
+              <div class="rdot"></div>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0">
+                <rect x="2" y="1" width="9" height="12" rx="1.5" stroke="#6a8ca0" stroke-width="1.3"/>
+                <path d="M5 1v3.5h4" stroke="#6a8ca0" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+                <line x1="4" y1="7" x2="10" y2="7" stroke="#6a8ca0" stroke-width="1" stroke-linecap="round"/>
+                <line x1="4" y1="9.5" x2="8" y2="9.5" stroke="#6a8ca0" stroke-width="1" stroke-linecap="round"/>
+              </svg>
+              <span class="pdf-name">{{ pdf }}</span>
+            </div>
+            {% endfor %}
+            {% if not preloaded_pdfs %}
+            <p style="color:var(--muted);font-size:12px;padding:8px;">אין קבצים שמורים</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="pdf-panel" id="panel-up">
+          <div class="drop" id="drop">
+            <input type="file" id="fileIn" accept=".pdf" onchange="onFile(this)">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" style="margin:0 auto 6px;display:block">
+              <path d="M11 14V4M7 7.5l4-4 4 4" stroke="#6a8ca0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M4 17h14" stroke="#6a8ca0" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <div class="drop-txt">גרור קובץ PDF לכאן</div>
+            <div class="drop-hint">או לחץ לבחירה</div>
+            <div class="drop-file" id="fname"></div>
+          </div>
+        </div>
+      </div>
+
+      <button class="proc-btn" id="procBtn" onclick="run()">
+        <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
+          <circle cx="7.5" cy="7.5" r="5" stroke="white" stroke-width="1.7"/>
+          <path d="M11.5 11.5l3 3" stroke="white" stroke-width="1.7" stroke-linecap="round"/>
+          <path d="M5.5 7.5h4M7.5 5.5v4" stroke="white" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        בדוק
+      </button>
+
+    </div>
+  </div>
+
+  <!-- VIEWER -->
+  <div class="viewer" id="viewer">
+    <iframe class="frame" id="frame" src=""></iframe>
+  </div>
+</div>
+
+<div class="err" id="err"></div>
+
+<script>
+  let tab = 'pre';
+  let pre = document.querySelector('.pdf-item.sel input')?.value || '';
+
+  function activateTab(t) {
+    tab = t;
+    document.querySelectorAll('.pdf-panel').forEach(x => x.classList.remove('active'));
+    document.getElementById('panel-' + t).classList.add('active');
+    const preLabel = document.getElementById('tabPreLabel');
+    const upBtn    = document.getElementById('tabUpBtn');
+    if (t === 'pre') {
+      preLabel.className = 'src-main-tab';
+      upBtn.className    = 'src-alt-tab';
+    } else {
+      preLabel.className = 'src-main-tab inactive';
+      upBtn.className    = 'src-alt-tab active';
+    }
+  }
+
+  function pickPre(el, name) {
+    document.querySelectorAll('.pdf-item').forEach(x => x.classList.remove('sel'));
+    el.classList.add('sel');
+    el.querySelector('input').checked = true;
+    pre = name;
+  }
+
+  function pickList(card) {
+    document.querySelectorAll('.wl-card').forEach(x => x.classList.remove('sel'));
+    card.classList.add('sel');
+    card.querySelector('input').checked = true;
+  }
+
+  function onFile(inp) {
+    document.getElementById('fname').textContent = inp.files[0]?.name || '';
+  }
+
+  const drop = document.getElementById('drop');
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault(); drop.classList.remove('over');
+    const f = e.dataTransfer.files[0];
+    if (f?.name.endsWith('.pdf')) {
+      const dt = new DataTransfer(); dt.items.add(f);
+      document.getElementById('fileIn').files = dt.files;
+      document.getElementById('fname').textContent = f.name;
+    }
+  });
+
+  let pdfState = null;
+  let prevKeys = null;
+  let activeListName = null;
+
+  async function run() {
+    const source = tab === 'pre' ? 'preloaded' : 'upload';
+    if (source === 'preloaded') {
+      if (!pre) { showErr('יש לבחור קובץ PDF'); return; }
+      pdfState = { source, preloaded: pre };
+    } else {
+      const f = document.getElementById('fileIn').files[0];
+      if (!f) { showErr('יש להעלות קובץ PDF'); return; }
+      pdfState = { source, fileObj: f };
+    }
+    prevKeys = null;
+    const checkedInput = document.querySelector('.wl-card.sel input');
+    const wordList = checkedInput ? checkedInput.value : '';
+    if (!wordList) { showErr('יש לבחור רשימת מילים'); return; }
+    activeListName = wordList;
+
+    document.querySelectorAll('.vseg-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.list === wordList);
+    });
+
+    document.getElementById('procBtn').disabled = true;
+    await _process(wordList);
+    document.getElementById('procBtn').disabled = false;
+  }
+
+  function switchListBtn(btn) {
+    if (!pdfState) return;
+    document.querySelectorAll('.vseg-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeListName = btn.dataset.list;
+    _process(activeListName);
+  }
+
+  async function _process(wordList) {
+    const fd = new FormData();
+    fd.append('word_list', wordList);
+    fd.append('pdf_source', pdfState.source);
+    fd.append('mode', 'above');
+    if (pdfState.source === 'preloaded') {
+      fd.append('preloaded_pdf', pdfState.preloaded);
+    } else {
+      fd.append('pdf_file', pdfState.fileObj);
+    }
+
+    document.getElementById('spinTxt').textContent = 'מתרגם ומסמן...';
+    document.getElementById('overlay').classList.add('on');
+
+    try {
+      const res  = await fetch('/process', { method: 'POST', body: fd });
+      const data = await res.json();
+      document.getElementById('overlay').classList.remove('on');
+      if (data.error) { showErr(data.error); return; }
+
+      // Percentage: exclude proper nouns from denominator
+      const denom = data.total_english_no_proper || data.total_english;
+      const pct = denom > 0
+        ? ((data.total_matches / denom) * 100).toFixed(1) + '%'
+        : '—%';
+
+      // Unknown words: total hits + unique count in parentheses
+      const unknownTotal  = (data.unknown_hits  || 0).toLocaleString();
+      const unknownUnique = (data.unknown_count || 0).toLocaleString();
+      const uniqueLabel   = data.unknown_count > 0 ? `(${unknownUnique} יחודיות)` : '';
+
+      // Proper nouns: total occurrences
+      const properTotal = (data.proper_noun_hits || data.proper_noun_count || 0).toLocaleString();
+
+      document.getElementById('sPct').textContent = pct;
+      document.getElementById('sX').textContent   = unknownTotal;
+      document.getElementById('sXu').textContent  = uniqueLabel;
+      document.getElementById('sN').textContent   = properTotal;
+      document.getElementById('sF').textContent   = data.original_name;
+
+      const dl = document.getElementById('btnDl');
+      dl.href     = '/download/' + encodeURIComponent(data.output_file);
+      dl.download = data.output_file;
+
+      document.getElementById('frame').src =
+        '/view/' + encodeURIComponent(data.output_file) + '?t=' + Date.now();
+
+      document.getElementById('setup').style.display = 'none';
+      document.getElementById('topbar').classList.add('on');
+      document.getElementById('viewer').classList.add('on');
+
+    } catch(e) {
+      document.getElementById('overlay').classList.remove('on');
+      showErr('שגיאה: ' + e.message);
+    }
+  }
+
+  function goBack() {
+    document.getElementById('viewer').classList.remove('on');
+    document.getElementById('topbar').classList.remove('on');
+    document.getElementById('setup').style.display = '';
+    document.getElementById('frame').src = '';
+    prevKeys = null;
+    pdfState = null;
+  }
+
+  function showErr(msg) {
+    const el = document.getElementById('err');
+    el.textContent = msg; el.classList.add('on');
+    setTimeout(() => el.classList.remove('on'), 4000);
+  }
+</script>
+</body>
+</html>
