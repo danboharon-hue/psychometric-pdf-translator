@@ -43,7 +43,10 @@ def get_pdf_list():
 @app.route("/")
 def index():
     pdfs = get_pdf_list()
-    return render_template("download.html", pdfs=pdfs, summary=SUMMARY, cache_bust=True)
+    print("DEBUG: Rendering download.html")
+    result = render_template("download.html", pdfs=pdfs, summary=SUMMARY)
+    print(f"DEBUG: Result title line: {[line for line in result.split(chr(10)) if 'title' in line][0] if '<title' in result else 'NO TITLE'}")
+    return result
 
 @app.route("/api/pdfs")
 def api_pdfs():

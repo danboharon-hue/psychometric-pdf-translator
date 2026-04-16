@@ -317,16 +317,33 @@ def _pdf_sort_key(name):
 
 @app.route("/")
 def index():
-    word_list_names = list(WORD_LISTS.keys())
-    word_list_sizes = {name: len(d) for name, d in WORD_LISTS.items()}
-    preloaded = sorted(
-        (f.name for f in PRELOADED_DIR.iterdir() if f.suffix.lower() == ".pdf"),
-        key=_pdf_sort_key
-    )
-    return render_template("index.html",
-                           word_lists=word_list_names,
-                           word_list_sizes=word_list_sizes,
-                           preloaded_pdfs=preloaded)
+    # Read processed PDFs from the processed folder
+    pdfs = {}
+    processed_dir = BASE_DIR / "processed"
+    if processed_dir.exists():
+        for word_list_dir in processed_dir.iterdir():
+            if word_list_dir.is_dir() and word_list_dir.name in ["NGSL", "מילון_הפסיכומטרי_של_המדינה"]:
+                # Map back the underscore name to proper name
+                if word_list_dir.name == "מילון_הפסיכומטרי_של_המדינה":
+                    word_list_name = "מילון הפסיכומטרי של המדינה"
+                else:
+                    word_list_name = word_list_dir.name
+
+                pdf_files = sorted([f.name for f in word_list_dir.glob("*.pdf")])
+                if pdf_files:
+                    pdfs[word_list_name] = pdf_files
+
+    # Load processing summary for statistics
+    summary = {}
+    summary_path = processed_dir / "processing_summary.json"
+    if summary_path.exists():
+        with open(summary_path, "r", encoding="utf-8") as f:
+            summary = json.load(f)
+
+    print(f"DEBUG: pdfs keys: {list(pdfs.keys())}")
+    result = render_template("download.html", pdfs=pdfs, summary=summary)
+    print(f"DEBUG: First 100 chars of result: {result[:100]}")
+    return result
 
 
 @app.route("/process", methods=["POST"])
@@ -375,8 +392,19 @@ def view(filename):
     return send_file(str(path), mimetype="application/pdf")
 
 
+@app.route("/download/<word_list>/<filename>")
+def download(word_list, filename):
+    # Convert space to underscore for directory names
+    word_list_dir = BASE_DIR / "processed" / word_list.replace(" ", "_")
+    path = word_list_dir / filename
+    if not path.exists():
+        return "File not found", 404
+    return send_file(str(path), as_attachment=True, download_name=filename)
+
+
 @app.route("/download/<path:filename>")
-def download(filename):
+def download_legacy(filename):
+    # Legacy route for backward compatibility
     path = OUTPUT_DIR / filename
     if not path.exists():
         return "File not found", 404
