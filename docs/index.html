@@ -7,17 +7,17 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg:      #e9f3fa;
+      --bg:      #f0f7ff;
       --surface: #ffffff;
-      --border:  #b8d8ed;
-      --accent:  #2a7dc9;
-      --accent2: #1a5f9e;
-      --text:    #1a2d3d;
-      --muted:   #6a8ca0;
-      --r:       10px;
+      --border:  #d4e9f7;
+      --accent:  #4a90e2;
+      --accent2: #2e5ba8;
+      --text:    #2c3e50;
+      --muted:   #7a9bc4;
+      --r:       16px;
       --line-h:  28px;
-      --line-c:  #c5dff0;
-      --margin-c:#e89090;
+      --line-c:  #dde9f5;
+      --margin-c:#e8d4d4;
     }
     html, body { height: 100%; overflow: hidden; }
 
@@ -45,12 +45,13 @@
       padding: 40px 20px;
     }
     .card {
-      background: rgba(255,255,255,.90);
-      backdrop-filter: blur(6px);
+      background: rgba(255,255,255,.95);
+      backdrop-filter: blur(8px);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 34px 36px 36px;
-      width: 100%; max-width: 500px;
+      border-radius: 24px;
+      padding: 40px 44px 44px;
+      width: 100%; max-width: 520px;
+      box-shadow: 0 8px 32px rgba(74, 144, 226, 0.08);
     }
 
     .card-title {
@@ -73,15 +74,16 @@
     }
     .wl-card {
       position: relative; cursor: pointer;
-      border: 2px solid var(--border); border-radius: 11px;
-      padding: 14px 13px 13px;
+      border: 2px solid var(--border); border-radius: 16px;
+      padding: 18px 16px 16px;
       background: var(--surface);
-      transition: border-color .15s, background .15s;
+      transition: all .2s ease;
       text-align: center;
-      display: flex; flex-direction: column; align-items: center; gap: 5px;
+      display: flex; flex-direction: column; align-items: center; gap: 7px;
+      box-shadow: 0 2px 8px rgba(74, 144, 226, 0.06);
     }
-    .wl-card:hover  { border-color: var(--accent); }
-    .wl-card.sel    { border-color: var(--accent); background: #eef6fd; }
+    .wl-card:hover  { border-color: var(--accent); box-shadow: 0 6px 16px rgba(74, 144, 226, 0.12); transform: translateY(-2px); }
+    .wl-card.sel    { border-color: var(--accent); background: #f0f7ff; box-shadow: 0 6px 20px rgba(74, 144, 226, 0.15); }
     .wl-card input  { position: absolute; opacity: 0; pointer-events: none; }
     .wl-icon-wrap {
       width: 38px; height: 38px; border-radius: 9px;
@@ -137,12 +139,13 @@
     .pdf-list::-webkit-scrollbar-track { background: transparent; }
     .pdf-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
     .pdf-item {
-      display: flex; align-items: center; gap: 8px; padding: 10px 12px;
-      border: 1px solid var(--border); border-radius: 9px;
-      cursor: pointer; transition: border-color .15s; background: var(--surface);
+      display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+      border: 1px solid var(--border); border-radius: 12px;
+      cursor: pointer; transition: all .2s ease; background: var(--surface);
+      box-shadow: 0 1px 3px rgba(74, 144, 226, 0.04);
     }
-    .pdf-item:hover { border-color: var(--accent); }
-    .pdf-item.sel   { border-color: var(--accent); background: #eef6fd; }
+    .pdf-item:hover { border-color: var(--accent); box-shadow: 0 4px 12px rgba(74, 144, 226, 0.1); background: #f8fbff; }
+    .pdf-item.sel   { border-color: var(--accent); background: #f0f7ff; box-shadow: 0 4px 12px rgba(74, 144, 226, 0.12); }
     .pdf-item input { display: none; }
     .rdot {
       width: 14px; height: 14px; border: 2px solid #bbb; border-radius: 50%;
@@ -169,15 +172,16 @@
     .drop-file { color: var(--text); font-size: 12px; margin-top: 5px; font-weight: 500; }
 
     .proc-btn {
-      width: 100%; height: 42px; margin-top: 20px;
-      background: var(--accent);
-      color: #fff; border: none; border-radius: var(--r);
-      font-size: 14px; font-weight: 700; letter-spacing: -.1px;
-      cursor: pointer; transition: background .15s; font-family: inherit;
+      width: 100%; height: 48px; margin-top: 24px;
+      background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+      color: #fff; border: none; border-radius: 14px;
+      font-size: 15px; font-weight: 700; letter-spacing: -.1px;
+      cursor: pointer; transition: all .2s ease; font-family: inherit;
       display: flex; align-items: center; justify-content: center; gap: 8px;
+      box-shadow: 0 4px 14px rgba(74, 144, 226, 0.3);
     }
-    .proc-btn:hover:not(:disabled) { background: var(--accent2); }
-    .proc-btn:disabled { opacity: .45; cursor: not-allowed; }
+    .proc-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4); }
+    .proc-btn:disabled { opacity: .5; cursor: not-allowed; }
 
     /* ══ ERROR ══ */
     .err {
