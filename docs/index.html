@@ -443,6 +443,61 @@
 <div class="err" id="err"></div>
 
 <script>
+  const STATS = {
+    "NGSL": {
+      "פסיכומטרי אביב 2022 פרק 1": { "pct": "86.3", "unknown_hits": 206, "unknown_count": 137, "proper_noun_hits": 102 },
+      "פסיכומטרי אביב 2022 פרק 2": { "pct": "86.1", "unknown_hits": 189, "unknown_count": 136, "proper_noun_hits": 100 },
+      "פסיכומטרי אביב 2025 פרק 1": { "pct": "86.1", "unknown_hits": 225, "unknown_count": 157, "proper_noun_hits": 122 },
+      "פסיכומטרי אביב 2025 פרק 2": { "pct": "86.5", "unknown_hits": 202, "unknown_count": 151, "proper_noun_hits": 100 },
+      "פסיכומטרי חורף 2022 פרק 1": { "pct": "83.4", "unknown_hits": 213, "unknown_count": 140, "proper_noun_hits": 115 },
+      "פסיכומטרי חורף 2022 פרק 2": { "pct": "88.8", "unknown_hits": 164, "unknown_count": 103, "proper_noun_hits": 101 },
+      "פסיכומטרי חורף 2023 פרק 1": { "pct": "87.9", "unknown_hits": 176, "unknown_count": 141, "proper_noun_hits": 87 },
+      "פסיכומטרי חורף 2023 פרק 2": { "pct": "83.7", "unknown_hits": 238, "unknown_count": 134, "proper_noun_hits": 100 },
+      "פסיכומטרי חורף 2024 פרק 1": { "pct": "85.0", "unknown_hits": 205, "unknown_count": 128, "proper_noun_hits": 102 },
+      "פסיכומטרי חורף 2024 פרק 2": { "pct": "88.9", "unknown_hits": 156, "unknown_count": 120, "proper_noun_hits": 89 },
+      "פסיכומטרי חורף 2025 פרק 1": { "pct": "86.3", "unknown_hits": 211, "unknown_count": 160, "proper_noun_hits": 121 },
+      "פסיכומטרי חורף 2025 פרק 2": { "pct": "83.5", "unknown_hits": 269, "unknown_count": 196, "proper_noun_hits": 69 },
+      "פסיכומטרי סתיו 2024 פרק 1": { "pct": "87.3", "unknown_hits": 160, "unknown_count": 120, "proper_noun_hits": 102 },
+      "פסיכומטרי סתיו 2024 פרק 2": { "pct": "85.2", "unknown_hits": 219, "unknown_count": 145, "proper_noun_hits": 104 },
+      "פסיכומטרי סתיו 2025 פרק 1": { "pct": "84.4", "unknown_hits": 242, "unknown_count": 179, "proper_noun_hits": 129 },
+      "פסיכומטרי סתיו 2025 פרק 2": { "pct": "86.8", "unknown_hits": 216, "unknown_count": 154, "proper_noun_hits": 109 },
+      "פסיכומטרי קיץ 2022 פרק 1": { "pct": "85.1", "unknown_hits": 244, "unknown_count": 142, "proper_noun_hits": 124 },
+      "פסיכומטרי קיץ 2022 פרק 2": { "pct": "86.7", "unknown_hits": 200, "unknown_count": 132, "proper_noun_hits": 119 },
+      "פסיכומטרי קיץ 2023 פרק 1": { "pct": "82.8", "unknown_hits": 263, "unknown_count": 154, "proper_noun_hits": 62 },
+      "פסיכומטרי קיץ 2023 פרק 2": { "pct": "83.6", "unknown_hits": 229, "unknown_count": 124, "proper_noun_hits": 113 },
+      "פסיכומטרי קיץ 2024 פרק 1": { "pct": "85.9", "unknown_hits": 198, "unknown_count": 136, "proper_noun_hits": 95 },
+      "פסיכומטרי קיץ 2024 פרק 2": { "pct": "84.2", "unknown_hits": 210, "unknown_count": 144, "proper_noun_hits": 123 },
+      "פסיכומטרי קיץ 2025 פרק 1": { "pct": "81.9", "unknown_hits": 242, "unknown_count": 157, "proper_noun_hits": 69 },
+      "פסיכומטרי קיץ 2025 פרק 2": { "pct": "89.4", "unknown_hits": 168, "unknown_count": 141, "proper_noun_hits": 68 }
+    },
+    "מילון הפסיכומטרי של המדינה": {
+      "פסיכומטרי אביב 2022 פרק 1": { "pct": "56.6", "unknown_hits": 649, "unknown_count": 244, "proper_noun_hits": 112 },
+      "פסיכומטרי אביב 2022 פרק 2": { "pct": "54.4", "unknown_hits": 616, "unknown_count": 250, "proper_noun_hits": 107 },
+      "פסיכומטרי אביב 2025 פרק 1": { "pct": "51.7", "unknown_hits": 771, "unknown_count": 278, "proper_noun_hits": 142 },
+      "פסיכומטרי אביב 2025 פרק 2": { "pct": "53.8", "unknown_hits": 684, "unknown_count": 266, "proper_noun_hits": 111 },
+      "פסיכומטרי חורף 2022 פרק 1": { "pct": "55.3", "unknown_hits": 567, "unknown_count": 227, "proper_noun_hits": 128 },
+      "פסיכומטרי חורף 2022 פרק 2": { "pct": "60.8", "unknown_hits": 569, "unknown_count": 192, "proper_noun_hits": 115 },
+      "פסיכומטרי חורף 2023 פרק 1": { "pct": "56.6", "unknown_hits": 619, "unknown_count": 260, "proper_noun_hits": 112 },
+      "פסיכומטרי חורף 2023 פרק 2": { "pct": "51.3", "unknown_hits": 706, "unknown_count": 245, "proper_noun_hits": 107 },
+      "פסיכומטרי חורף 2024 פרק 1": { "pct": "56.5", "unknown_hits": 586, "unknown_count": 220, "proper_noun_hits": 119 },
+      "פסיכומטרי חורף 2024 פרק 2": { "pct": "57.1", "unknown_hits": 593, "unknown_count": 235, "proper_noun_hits": 112 },
+      "פסיכומטרי חורף 2025 פרק 1": { "pct": "51.5", "unknown_hits": 739, "unknown_count": 284, "proper_noun_hits": 136 },
+      "פסיכומטרי חורף 2025 פרק 2": { "pct": "53.8", "unknown_hits": 741, "unknown_count": 301, "proper_noun_hits": 94 },
+      "פסיכומטרי סתיו 2024 פרק 1": { "pct": "55.9", "unknown_hits": 549, "unknown_count": 229, "proper_noun_hits": 122 },
+      "פסיכומטרי סתיו 2024 פרק 2": { "pct": "53.7", "unknown_hits": 666, "unknown_count": 266, "proper_noun_hits": 144 },
+      "פסיכומטרי סתיו 2025 פרק 1": { "pct": "54.0", "unknown_hits": 703, "unknown_count": 277, "proper_noun_hits": 155 },
+      "פסיכומטרי סתיו 2025 פרק 2": { "pct": "54.3", "unknown_hits": 733, "unknown_count": 268, "proper_noun_hits": 140 },
+      "פסיכומטרי קיץ 2022 פרק 1": { "pct": "52.4", "unknown_hits": 769, "unknown_count": 248, "proper_noun_hits": 144 },
+      "פסיכומטרי קיץ 2022 פרק 2": { "pct": "56.7", "unknown_hits": 633, "unknown_count": 220, "proper_noun_hits": 158 },
+      "פסיכומטרי קיץ 2023 פרק 1": { "pct": "52.8", "unknown_hits": 713, "unknown_count": 230, "proper_noun_hits": 82 },
+      "פסיכומטרי קיץ 2023 פרק 2": { "pct": "52.1", "unknown_hits": 664, "unknown_count": 240, "proper_noun_hits": 126 },
+      "פסיכומטרי קיץ 2024 פרק 1": { "pct": "54.1", "unknown_hits": 634, "unknown_count": 231, "proper_noun_hits": 117 },
+      "פסיכומטרי קיץ 2024 פרק 2": { "pct": "54.0", "unknown_hits": 600, "unknown_count": 250, "proper_noun_hits": 145 },
+      "פסיכומטרי קיץ 2025 פרק 1": { "pct": "54.9", "unknown_hits": 596, "unknown_count": 237, "proper_noun_hits": 83 },
+      "פסיכומטרי קיץ 2025 פרק 2": { "pct": "55.0", "unknown_hits": 702, "unknown_count": 288, "proper_noun_hits": 85 }
+    }
+  };
+
   const psychometricFiles = [
     "פסיכומטרי אביב 2022 פרק 1",
     "פסיכומטרי אביב 2022 פרק 2",
@@ -520,6 +575,20 @@
     document.querySelectorAll('.vseg-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     activeListName = btn.dataset.list;
+
+    // Update stats for new word list
+    const stats = STATS[activeListName] && STATS[activeListName][pre];
+    if (stats) {
+      document.getElementById('sPct').textContent = stats.pct + '%';
+      document.getElementById('sX').textContent = stats.unknown_hits + ' (' + stats.unknown_count + ' יחודיות)';
+      document.getElementById('sN').textContent = stats.proper_noun_hits;
+    }
+
+    // Update PDF viewer
+    const folder = activeListName === 'NGSL' ? 'NGSL' : 'מילון_הפסיכומטרי_של_המדינה';
+    const pdfUrl = `https://github.com/danboharon-hue/psychometric-pdf-translator/raw/master/processed/${folder}/${pre}_translated.pdf`;
+    document.getElementById('frame').src = `https://docs.google.com/gview?url=${encodeURIComponent(pdfUrl)}&embedded=true`;
+    document.getElementById('btnDl').href = pdfUrl;
   }
 
   async function run() {
@@ -548,9 +617,17 @@
     const folder = wordList === 'NGSL' ? 'NGSL' : 'מילון_הפסיכומטרי_של_המדינה';
     const pdfUrl = `https://github.com/danboharon-hue/psychometric-pdf-translator/raw/master/processed/${folder}/${pre}_translated.pdf`;
 
-    document.getElementById('sPct').textContent = '—%';
-    document.getElementById('sX').textContent = '—';
-    document.getElementById('sN').textContent = '—';
+    // Show pre-calculated stats
+    const stats = STATS[wordList] && STATS[wordList][pre];
+    if (stats) {
+      document.getElementById('sPct').textContent = stats.pct + '%';
+      document.getElementById('sX').textContent = stats.unknown_hits + ' (' + stats.unknown_count + ' יחודיות)';
+      document.getElementById('sN').textContent = stats.proper_noun_hits;
+    } else {
+      document.getElementById('sPct').textContent = '—%';
+      document.getElementById('sX').textContent = '—';
+      document.getElementById('sN').textContent = '—';
+    }
     document.getElementById('sF').textContent = pre;
 
     document.getElementById('btnDl').href = pdfUrl;
