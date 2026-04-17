@@ -556,8 +556,8 @@
     document.getElementById('btnDl').href = pdfUrl;
     document.getElementById('btnDl').download = `${pre}_translated.pdf`;
 
-    // Display PDF using PDF.js viewer
-    const viewerUrl = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`;
+    // Display PDF using Google Docs Viewer
+    const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(pdfUrl)}&embedded=true`;
     document.getElementById('frame').src = viewerUrl;
 
     document.getElementById('setup').style.display = 'none';
