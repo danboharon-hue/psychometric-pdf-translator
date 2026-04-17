@@ -556,7 +556,9 @@
     document.getElementById('btnDl').href = pdfUrl;
     document.getElementById('btnDl').download = `${pre}_translated.pdf`;
 
-    document.getElementById('frame').src = pdfUrl;
+    // Display PDF using PDF.js viewer
+    const viewerUrl = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`;
+    document.getElementById('frame').src = viewerUrl;
 
     document.getElementById('setup').style.display = 'none';
     document.getElementById('topbar').classList.add('on');
